@@ -27,7 +27,7 @@ static const char* webcamera_spec[] =
     // Configuration variables
     "conf.default.camera_id", "0",
     "conf.default.output_color_format", "RGB",
-    "conf.default.camera_param_filename", "camera.yml",
+    "conf.default.camera_param_filename", "..\\..\\camera.yml",
     "conf.default.undistortion_flag", "false",
     "conf.default.cap_continuous_flag", "false",
     // Widget
