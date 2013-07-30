@@ -17,7 +17,7 @@ static const char* webcamera_spec[] =
     "type_name",         "WebCamera",
     "description",       "Image Capture Component for General Web Camera",
     "version",           "1.0.0",
-    "vendor",            "Kenichi Ohara, Osaka University",
+    "vendor",            "Kenichi Ohara, Meijo University",
     "category",          "Image Processing",
     "activity_type",     "PERIODIC",
     "kind",              "DataFlowComponent",
