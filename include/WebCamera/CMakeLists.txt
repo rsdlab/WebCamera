@@ -1,5 +1,4 @@
 set(hdrs WebCamera.h
-    PARENT_SCOPE
     ImgSVC_impl.h
     )
 
