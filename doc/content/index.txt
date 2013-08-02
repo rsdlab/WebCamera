@@ -109,8 +109,8 @@ Parameter        Data type          Default Value    Effect
 camera_id        int                0                
 output_color_format string             RGB              
 camera_param_filename string             camera.yml       
-undistortion_flag bool               false            
-cap_continuous_flag bool               false            
+undistortion_flag string             false            
+cap_continuous_flag string             false            
 ================ ================== ================ ======
 
 Ports

@@ -1,7 +1,7 @@
 // -*- C++ -*-
 /*!
  * @file  WebCamera.h
- * @brief Image Capture Component for General Web Camera
+ * @brief Web Camera RTC with common camera interface
  * @date  $Date$
  *
  * $Id$
@@ -30,9 +30,7 @@
 
 // </rtc-template>
 
-
-#include <opencv/cv.h>
-#include <opencv/highgui.h>
+#include<opencv2/opencv.hpp>
 
 using namespace RTC;
 using namespace Img;
@@ -48,7 +46,7 @@ typedef struct CameraParam_
 
 /*!
  * @class WebCamera
- * @brief Image Capture Component for General Web Camera
+ * @brief Web Camera RTC with common camera interface
  *
  */
 class WebCamera
@@ -261,13 +259,14 @@ class WebCamera
    * - Name:  undistortion_flag
    * - DefaultValue: false
    */
-  bool m_undistortion_flag;
+  std::string m_undistortion_flag;
   /*!
    * 
    * - Name:  cap_continuous_flag
    * - DefaultValue: false
    */
-  bool m_cap_continuous_flag;
+  std::string m_cap_continuous_flag;
+
   // </rtc-template>
 
   // DataInPort declaration
@@ -278,10 +277,10 @@ class WebCamera
 
   // DataOutPort declaration
   // <rtc-template block="outport_declare">
-  TimedCameraImage m_CameraImage;
+  Img::TimedCameraImage m_CameraImage;
   /*!
    */
-  OutPort<TimedCameraImage> m_CameraImageOut;
+  OutPort<Img::TimedCameraImage> m_CameraImageOut;
   
   // </rtc-template>
 
@@ -314,10 +313,9 @@ class WebCamera
   // <rtc-template block="private_operation">
   
   // </rtc-template>
-	 cv::VideoCapture cap;
-	 cv::Mat cap_img, nChannels_img;
-	 cv::Mat image, temp_image;
-	 int width, height, depth, channels;
+	 cv::VideoCapture cam_cap;
+	 cv::Mat src_image, proc_image;
+	 int width, height, depth, nchannels;
 	 CameraParam cam_param;
 };
 

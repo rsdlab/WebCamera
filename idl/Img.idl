@@ -69,11 +69,9 @@ struct TimedMultiCameraImage
 /* stereo image capture */
 interface CameraCaptureService {
   oneway void take_one_frame();
-//  /*
   oneway void take_multi_frames(in long num);
   oneway void start_continuous();
   oneway void stop_continuous();
-//  */
 };
 
 }; /* module */
