@@ -95,9 +95,6 @@ RTC::ReturnCode_t WebCamera::onInitialize()
   bindParameter("cap_continuous_flag", m_cap_continuous_flag, "false");
   // </rtc-template>
 
-	cam_cap = NULL;
-	src_image = NULL;
-  
   return RTC::RTC_OK;
 }
 
@@ -321,7 +318,7 @@ RTC::ReturnCode_t WebCamera::onExecute(RTC::UniqueId ec_id)
 	{
 		RTC_DEBUG( ("Waiting capture mode command via ServicePort") );
 		std::cout << "Waiting capture mode command via ServicePort" << std::endl;
-		RTC::RTC_OK;
+		return RTC::RTC_OK;
 	}
   return RTC::RTC_OK;
 }
