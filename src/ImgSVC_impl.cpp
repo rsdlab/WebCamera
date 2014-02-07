@@ -13,7 +13,7 @@
 CameraCaptureServiceSVC_impl::CameraCaptureServiceSVC_impl()
 {
   m_cap_continuous = false;
-	m_cap_count = 0;
+  m_cap_count = 0;
 }
 
 
@@ -28,22 +28,27 @@ CameraCaptureServiceSVC_impl::~CameraCaptureServiceSVC_impl()
  */
 void CameraCaptureServiceSVC_impl::take_one_frame()
 {
-	m_cap_count = 1;
+  m_cap_count = 1;
 }
 
 void CameraCaptureServiceSVC_impl::take_multi_frames(CORBA::Long num)
 {
-	m_cap_count = num;
+  m_cap_count = num;
 }
 
 void CameraCaptureServiceSVC_impl::start_continuous()
 {
-	m_cap_continuous = true;
+  m_cap_continuous = true;
 }
 
 void CameraCaptureServiceSVC_impl::stop_continuous()
 {
-	m_cap_continuous = false;
+  m_cap_continuous = false;
+}
+
+void CameraCaptureServiceSVC_impl::getProfile(Img::CameraDeviceProfile_out profile)
+{
+
 }
 
 

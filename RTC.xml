@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<rtc:RtcProfile rtc:version="0.2" rtc:id="RTC:Kenichi Ohara, Meijo University:ImageProcessing:WebCamera:1.0.0" xmlns:rtcExt="http://www.openrtp.org/namespaces/rtc_ext" xmlns:rtcDoc="http://www.openrtp.org/namespaces/rtc_doc" xmlns:rtc="http://www.openrtp.org/namespaces/rtc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <rtc:BasicInfo xsi:type="rtcExt:basic_info_ext" rtcExt:saveProject="WebCamera" rtc:updateDate="2012-08-08T10:49:16+09:00" rtc:creationDate="2012-08-08T10:45:12+09:00" rtc:version="1.0.0" rtc:vendor="Kenichi Ohara, Meijo University" rtc:maxInstances="1" rtc:executionType="PeriodicExecutionContext" rtc:executionRate="30.0" rtc:description="Web Camera RTC with common camera interface" rtc:category="ImageProcessing" rtc:componentKind="DataFlowComponent" rtc:activityType="PERIODIC" rtc:componentType="STATIC" rtc:name="WebCamera">
+<rtc:RtcProfile rtc:version="0.2" rtc:id="RTC:Kenichi Ohara, Meijo University:ImageProcessing:WebCamera:2.0.0" xmlns:rtcExt="http://www.openrtp.org/namespaces/rtc_ext" xmlns:rtcDoc="http://www.openrtp.org/namespaces/rtc_doc" xmlns:rtc="http://www.openrtp.org/namespaces/rtc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <rtc:BasicInfo xsi:type="rtcExt:basic_info_ext" rtcExt:saveProject="WebCamera" rtc:updateDate="2014-02-04T17:15:06+09:00" rtc:creationDate="2012-08-08T10:45:12+09:00" rtc:version="2.0.0" rtc:vendor="Kenichi Ohara, Meijo University" rtc:maxInstances="1" rtc:executionType="PeriodicExecutionContext" rtc:executionRate="30.0" rtc:description="Web Camera RTC with common camera interface version 2.0" rtc:category="ImageProcessing" rtc:componentKind="DataFlowComponent" rtc:activityType="PERIODIC" rtc:componentType="STATIC" rtc:name="WebCamera">
+        <rtcExt:VersionUpLogs></rtcExt:VersionUpLogs>
         <rtcExt:VersionUpLogs></rtcExt:VersionUpLogs>
         <rtcExt:VersionUpLogs></rtcExt:VersionUpLogs>
         <rtcExt:VersionUpLogs></rtcExt:VersionUpLogs>
@@ -43,13 +44,27 @@
                                 </rtc:propertyIsEqualTo>
                             </rtc:ConstraintUnitType>
                         </rtc:Constraint>
+                        <rtc:Constraint>
+                            <rtc:ConstraintUnitType>
+                                <rtc:propertyIsEqualTo rtc:matchCase="false">
+                                    <rtc:Literal>JPEG</rtc:Literal>
+                                </rtc:propertyIsEqualTo>
+                            </rtc:ConstraintUnitType>
+                        </rtc:Constraint>
+                        <rtc:Constraint>
+                            <rtc:ConstraintUnitType>
+                                <rtc:propertyIsEqualTo rtc:matchCase="false">
+                                    <rtc:Literal>PNG</rtc:Literal>
+                                </rtc:propertyIsEqualTo>
+                            </rtc:ConstraintUnitType>
+                        </rtc:Constraint>
                     </rtc:Or>
                 </rtc:ConstraintUnitType>
             </rtc:Constraint>
-            <rtcExt:Properties rtcExt:value="ordered_list" rtcExt:name="__widget__"/>
+            <rtcExt:Properties rtcExt:value="radio" rtcExt:name="__widget__"/>
         </rtc:Configuration>
-        <rtc:Configuration xsi:type="rtcExt:configuration_ext" rtcExt:variableName="" rtc:unit="" rtc:defaultValue="camera.yml" rtc:type="string" rtc:name="camera_param_filename">
-            <rtcExt:Properties rtcExt:value="ordered_list" rtcExt:name="__widget__"/>
+        <rtc:Configuration xsi:type="rtcExt:configuration_ext" rtcExt:variableName="" rtc:unit="" rtc:defaultValue="..\..\camera.yml" rtc:type="string" rtc:name="camera_param_filename">
+            <rtcExt:Properties rtcExt:value="text" rtcExt:name="__widget__"/>
         </rtc:Configuration>
         <rtc:Configuration xsi:type="rtcExt:configuration_ext" rtcExt:variableName="" rtc:unit="" rtc:defaultValue="false" rtc:type="string" rtc:name="undistortion_flag">
             <rtc:Constraint>
@@ -96,6 +111,18 @@
                 </rtc:ConstraintUnitType>
             </rtc:Constraint>
             <rtcExt:Properties rtcExt:value="radio" rtcExt:name="__widget__"/>
+        </rtc:Configuration>
+        <rtc:Configuration xsi:type="rtcExt:configuration_ext" rtcExt:variableName="" rtc:unit="" rtc:defaultValue="75" rtc:type="int" rtc:name="compression_ratio">
+            <rtc:Constraint>
+                <rtc:ConstraintUnitType>
+                    <rtc:propertyIsBetween>
+                        <rtc:LowerBoundary>0</rtc:LowerBoundary>
+                        <rtc:UpperBoundary>100</rtc:UpperBoundary>
+                    </rtc:propertyIsBetween>
+                </rtc:ConstraintUnitType>
+            </rtc:Constraint>
+            <rtcDoc:Doc rtcDoc:constraint="" rtcDoc:range="" rtcDoc:unit="" rtcDoc:description="This parameter can control the compression ratio for JPEG and PNG color format." rtcDoc:defaultValue="" rtcDoc:dataname=""/>
+            <rtcExt:Properties rtcExt:value="slider.1" rtcExt:name="__widget__"/>
         </rtc:Configuration>
     </rtc:ConfigurationSet>
     <rtc:DataPorts xsi:type="rtcExt:dataport_ext" rtcExt:position="RIGHT" rtcExt:variableName="" rtc:unit="" rtc:subscriptionType="" rtc:dataflowType="" rtc:interfaceType="" rtc:idlFile="" rtc:type="Img::TimedCameraImage" rtc:name="CameraImage" rtc:portType="DataOutPort"/>

@@ -40,9 +40,10 @@ class CameraCaptureServiceSVC_impl
    void take_multi_frames(CORBA::Long num);
    void start_continuous();
    void stop_continuous();
+   void getProfile(Img::CameraDeviceProfile_out profile);
 
-	 int m_cap_count;
-	 bool m_cap_continuous;
+   int m_cap_count;
+   bool m_cap_continuous;
 
 };
 

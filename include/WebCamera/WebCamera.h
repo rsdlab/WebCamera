@@ -1,7 +1,7 @@
 // -*- C++ -*-
 /*!
  * @file  WebCamera.h
- * @brief Web Camera RTC with common camera interface
+ * @brief Web Camera RTC with common camera interface version 2.0
  * @date  $Date$
  *
  * $Id$
@@ -30,11 +30,13 @@
 
 // </rtc-template>
 
+//Include file for OpenCV functions
 #include<opencv2/opencv.hpp>
 
 using namespace RTC;
 using namespace Img;
 
+//Structure definition for common camera interface
 typedef struct CameraParam_ 
 {
 	cv::Size	imageSize;
@@ -46,7 +48,7 @@ typedef struct CameraParam_
 
 /*!
  * @class WebCamera
- * @brief Web Camera RTC with common camera interface
+ * @brief Web Camera RTC with common camera interface version 2.0
  *
  */
 class WebCamera
@@ -251,7 +253,7 @@ class WebCamera
   /*!
    * 
    * - Name:  camera_param_filename
-   * - DefaultValue: camera.yml
+   * - DefaultValue: NONE
    */
   std::string m_camera_param_filename;
   /*!
@@ -266,6 +268,13 @@ class WebCamera
    * - DefaultValue: false
    */
   std::string m_cap_continuous_flag;
+  /*!
+   * This parameter can control the compression ratio for JPEG
+   * and PNG color format.
+   * - Name:  compression_ratio
+   * - DefaultValue: 75
+   */
+  int m_compression_ratio;
 
   // </rtc-template>
 
@@ -313,10 +322,11 @@ class WebCamera
   // <rtc-template block="private_operation">
   
   // </rtc-template>
-	 cv::VideoCapture cam_cap;
-	 cv::Mat src_image, proc_image;
-	 int width, height, depth, nchannels;
-	 CameraParam cam_param;
+  cv::VideoCapture cam_cap;
+  cv::Mat src_image, proc_image;
+  int width, height, depth, nchannels;
+  CameraParam cam_param;
+
 };
 
 

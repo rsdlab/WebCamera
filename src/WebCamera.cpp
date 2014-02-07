@@ -1,7 +1,7 @@
 // -*- C++ -*-
 /*!
  * @file  WebCamera.cpp
- * @brief Web Camera RTC with common camera interface
+ * @brief Web Camera RTC with common camera interface version 2.0
  * @date $Date$
  *
  * $Id$
@@ -15,8 +15,8 @@ static const char* webcamera_spec[] =
   {
     "implementation_id", "WebCamera",
     "type_name",         "WebCamera",
-    "description",       "Web Camera RTC with common camera interface",
-    "version",           "1.0.0",
+    "description",       "Web Camera RTC with common camera interface version 2.0",
+    "version",           "2.0.0",
     "vendor",            "Kenichi Ohara, Meijo University",
     "category",          "ImageProcessing",
     "activity_type",     "PERIODIC",
@@ -30,16 +30,19 @@ static const char* webcamera_spec[] =
     "conf.default.camera_param_filename", "..\\..\\camera.yml",
     "conf.default.undistortion_flag", "false",
     "conf.default.cap_continuous_flag", "true",
+    "conf.default.compression_ratio", "75",
     // Widget
     "conf.__widget__.camera_id", "text",
-    "conf.__widget__.output_color_format", "ordered_list",
-    "conf.__widget__.camera_param_filename", "ordered_list",
+    "conf.__widget__.output_color_format", "radio",
+    "conf.__widget__.camera_param_filename", "text",
     "conf.__widget__.undistortion_flag", "radio",
     "conf.__widget__.cap_continuous_flag", "radio",
+    "conf.__widget__.compression_ratio", "slider.1",
     // Constraints
-    "conf.__constraints__.output_color_format", "(RGB,GRAY)",
+    "conf.__constraints__.output_color_format", "(RGB,GRAY,JPEG,PNG)",
     "conf.__constraints__.undistortion_flag", "(true,false)",
     "conf.__constraints__.cap_continuous_flag", "(true,false)",
+    "conf.__constraints__.compression_ratio", "0<=x<=100",
     ""
   };
 // </rtc-template>
@@ -90,11 +93,12 @@ RTC::ReturnCode_t WebCamera::onInitialize()
   // Bind variables and configuration variable
   bindParameter("camera_id", m_camera_id, "0");
   bindParameter("output_color_format", m_output_color_format, "RGB");
-  bindParameter("camera_param_filename", m_camera_param_filename, "camera.yml");
+  bindParameter("camera_param_filename", m_camera_param_filename, "..\\..\\camera.yml");
   bindParameter("undistortion_flag", m_undistortion_flag, "false");
   bindParameter("cap_continuous_flag", m_cap_continuous_flag, "false");
+  bindParameter("compression_ratio", m_compression_ratio, "75");
   // </rtc-template>
-
+  
   return RTC::RTC_OK;
 }
 
@@ -144,7 +148,7 @@ RTC::ReturnCode_t WebCamera::onActivated(RTC::UniqueId ec_id)
 
 	if(nchannels > src_image.channels())
 	{
-		if(m_output_color_format == "RGB" )
+		if(m_output_color_format == "RGB" || m_output_color_format == "JPEG" || m_output_color_format == "PNG")
 		{
 			std::cout << "Convert GRAY image to RGB color image" <<std::endl;
 		}
@@ -155,7 +159,7 @@ RTC::ReturnCode_t WebCamera::onActivated(RTC::UniqueId ec_id)
 	}
 	else
 	{
-		if(m_output_color_format == "RGB")
+		if(m_output_color_format == "RGB" || m_output_color_format == "JPEG" || m_output_color_format == "PNG")
 		{
 			std::cout << "Convert BGR color image to RGB color image" << std::endl;			
 		}
@@ -201,12 +205,13 @@ RTC::ReturnCode_t WebCamera::onActivated(RTC::UniqueId ec_id)
 	else
 	{
 		RTC_ERROR(( "Unable to open selected camera parameter file: %s", m_camera_param_filename.c_str() ));
+		RTC_ERROR(( "Camera parameters are set to zero" ));
 		std::cout << "Unable to open selected camera parameter file: " << m_camera_param_filename.c_str() << std::endl;
 		std::cout << "Please confirm the filename and set the correct filename" << std::endl;
 		return RTC::RTC_ERROR;
 	}
 
-  return RTC::RTC_OK;
+	return RTC::RTC_OK;
 }
 
 
@@ -218,14 +223,13 @@ RTC::ReturnCode_t WebCamera::onDeactivated(RTC::UniqueId ec_id)
 	src_image.release();
 	cam_cap.release();
 
-  return RTC::RTC_OK;
+	return RTC::RTC_OK;
 }
 
 
 RTC::ReturnCode_t WebCamera::onExecute(RTC::UniqueId ec_id)
 {
 	//Capture mode select
-
 	if(m_CameraCaptureService.m_cap_continuous || (m_CameraCaptureService.m_cap_count > 0))
 	{
 		if( m_CameraCaptureService.m_cap_count > 0) --m_CameraCaptureService.m_cap_count;
@@ -256,7 +260,7 @@ RTC::ReturnCode_t WebCamera::onExecute(RTC::UniqueId ec_id)
 		cv::Mat proc_image;
 		if(nchannels > src_image.channels())
 		{
-			if( m_output_color_format == "RGB" )
+			if( m_output_color_format == "RGB" || m_output_color_format == "JPEG" || m_output_color_format == "PNG")
 				cv::cvtColor(src_image, proc_image, CV_GRAY2RGB);
 			nchannels = 3;
 		}
@@ -270,7 +274,7 @@ RTC::ReturnCode_t WebCamera::onExecute(RTC::UniqueId ec_id)
 		}
 		else
 		{
-			if( m_output_color_format == "RGB" )
+			if( m_output_color_format == "RGB" || m_output_color_format == "JPEG" || m_output_color_format == "PNG")
 				cv::cvtColor(src_image, proc_image, CV_BGR2RGB);
 			else
 				proc_image = src_image;
@@ -303,11 +307,57 @@ RTC::ReturnCode_t WebCamera::onExecute(RTC::UniqueId ec_id)
 		//Copy image parameter to output data based on TimedCameraImage structure
 		m_CameraImage.data.image.width = width;
 		m_CameraImage.data.image.height = height;
-		m_CameraImage.data.image.format = (m_output_color_format == "RGB") ? Img::CF_RGB : (m_output_color_format == "GRAY") ? Img::CF_GRAY : Img::CF_UNKNOWN;
-		m_CameraImage.data.image.raw_data.length( width * height * nchannels);
-		for( int i(0); i< height; ++i )
-			memcpy(&m_CameraImage.data.image.raw_data[ i * width * nchannels], &proc_image.data[ i * proc_image.step ], width * nchannels);
 
+		//Transmission image data creation based on selected image compression mode
+		if( m_output_color_format == "RGB")
+		{
+			m_CameraImage.data.image.format = Img::CF_RGB;
+			m_CameraImage.data.image.raw_data.length( width * height * nchannels);
+			for( int i(0); i< height; ++i )
+				memcpy(&m_CameraImage.data.image.raw_data[ i * width * nchannels], &proc_image.data[ i * proc_image.step ], width * nchannels);
+		}
+		else if(m_output_color_format == "JPEG")
+		{
+			m_CameraImage.data.image.format = Img::CF_JPEG;
+			//Jpeg encoding using OpenCV image compression function
+			std::vector<int> compression_param = std::vector<int>(2); 
+			compression_param[0] = CV_IMWRITE_JPEG_QUALITY;
+			compression_param[1] = m_compression_ratio;
+			//Encode raw image data to jpeg data
+			std::vector<uchar> compressed_image;
+			cv::imencode(".jpg", proc_image, compressed_image, compression_param);
+			//Copy encoded jpeg data to Outport Buffer
+			m_CameraImage.data.image.raw_data.length(compressed_image.size());
+			memcpy(&m_CameraImage.data.image.raw_data[0], &compressed_image[0], sizeof(unsigned char) * compressed_image.size());
+		}
+		else if(m_output_color_format == "PNG")
+		{
+			m_CameraImage.data.image.format = Img::CF_PNG;
+			//Jpeg encoding using OpenCV image compression function
+			std::vector<int> compression_param = std::vector<int>(2); 
+			compression_param[0] = CV_IMWRITE_PNG_COMPRESSION;
+			compression_param[1] = (int)((double)m_compression_ratio/10.0);
+			if(compression_param[1] == 10)
+				compression_param[1] = 9;
+			std::cout<<"PNG compression ratio: "<<compression_param[1] << "\r";
+
+
+			//Encode raw image data to jpeg data
+			std::vector<uchar> compressed_image;
+			cv::imencode(".png", proc_image, compressed_image, compression_param);
+			//Copy encoded jpeg data to Outport Buffer
+			m_CameraImage.data.image.raw_data.length(compressed_image.size());
+			memcpy(&m_CameraImage.data.image.raw_data[0], &compressed_image[0], sizeof(unsigned char) * compressed_image.size());
+		}
+		else
+		{
+			m_CameraImage.data.image.format = Img::CF_GRAY;
+
+			std::cout<<"Selected image compression mode is not defined. Please confirm correct compression mode!"<<std::endl;
+			m_CameraImage.data.image.raw_data.length( width * height * nchannels);
+			for( int i(0); i< height; ++i )
+				memcpy(&m_CameraImage.data.image.raw_data[ i * width * nchannels], &proc_image.data[ i * proc_image.step ], width * nchannels);			
+		}
 		//Output image data via OutPort
 		m_CameraImageOut.write();
 		//***********************************************************************************
@@ -320,7 +370,7 @@ RTC::ReturnCode_t WebCamera::onExecute(RTC::UniqueId ec_id)
 		std::cout << "Waiting capture mode command via ServicePort" << std::endl;
 		return RTC::RTC_OK;
 	}
-  return RTC::RTC_OK;
+	return RTC::RTC_OK;
 }
 
 

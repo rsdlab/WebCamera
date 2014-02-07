@@ -100,9 +100,10 @@ WebCameraは ``WebCameraComp`` を実行（ ``${prefix}/components/bin`` に
 ================ ================== ================ ====
 camera_id        int                0                
 output_color_format string             RGB              
-camera_param_filename string             camera.yml       
+camera_param_filename string             ..\..\camera.yml 
 undistortion_flag string             false            
 cap_continuous_flag string             false            
+compression_ratio int                75               This parameter can control the compression ratio for JPEG and PNG color format.
 ================ ================== ================ ====
 
 ポート
