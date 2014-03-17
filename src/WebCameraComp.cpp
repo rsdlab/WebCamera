@@ -14,6 +14,8 @@
 #include "WebCamera.h"
 
 
+static WebCamera* pCam;
+
 void MyModuleInit(RTC::Manager* manager)
 {
   WebCameraInit(manager);
@@ -28,6 +30,7 @@ void MyModuleInit(RTC::Manager* manager)
     abort();
   }
 
+  pCam = dynamic_cast<WebCamera*>(comp);
   // Example
   // The following procedure is examples how handle RT-Components.
   // These should not be in this function.
@@ -88,7 +91,19 @@ int main (int argc, char** argv)
 
   // run the manager in blocking mode
   // runManager(false) is the default.
-  manager->runManager();
+  manager->runManager(true);
+  
+  while(!pCam);
+
+  pCam->initCapture();
+
+  while(pCam->isAlive()) {
+    if (pCam->isActive()) {
+      pCam->captureAndProcess();
+    }
+  }
+
+  pCam->finiCapture();
 
   // If you want to run the manager in non-blocking mode, do like this
   // manager->runManager(true);

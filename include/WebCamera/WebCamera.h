@@ -10,18 +10,20 @@
 #ifndef WEBCAMERA_H
 #define WEBCAMERA_H
 
+#include "ImgSVC_impl.h"
+#include <rtm/idl/BasicDataTypeSkel.h>
+#include <rtm/idl/ExtendedDataTypesSkel.h>
+#include <rtm/idl/InterfaceDataTypesSkel.h>
+
 #include <rtm/Manager.h>
 #include <rtm/DataFlowComponentBase.h>
 #include <rtm/CorbaPort.h>
 #include <rtm/DataInPort.h>
 #include <rtm/DataOutPort.h>
-#include <rtm/idl/BasicDataTypeSkel.h>
-#include <rtm/idl/ExtendedDataTypesSkel.h>
-#include <rtm/idl/InterfaceDataTypesSkel.h>
 
 // Service implementation headers
 // <rtc-template block="service_impl_h">
-#include "ImgSVC_impl.h"
+
 
 // </rtc-template>
 
@@ -94,7 +96,7 @@ class WebCamera
    * 
    * 
    */
-  // virtual RTC::ReturnCode_t onFinalize();
+   virtual RTC::ReturnCode_t onFinalize();
 
   /***
    *
@@ -327,6 +329,15 @@ class WebCamera
   int width, height, depth, nchannels;
   CameraParam cam_param;
 
+  bool is_alive, is_active;
+public:
+  RTC::ReturnCode_t initCapture();
+  RTC::ReturnCode_t finiCapture();
+  RTC::ReturnCode_t captureAndProcess();
+
+
+  bool isActive() {return is_active;}
+  bool isAlive() {return is_alive;}
 };
 
 
