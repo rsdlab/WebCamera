@@ -27,7 +27,7 @@ static const char* webcamera_spec[] =
     // Configuration variables
     "conf.default.camera_id", "0",
     "conf.default.output_color_format", "RGB",
-    "conf.default.camera_param_filename", "..\\..\\camera.yml",
+    "conf.default.camera_param_filename", "NULL",
     "conf.default.undistortion_flag", "false",
     "conf.default.cap_continuous_flag", "true",
     "conf.default.compression_ratio", "75",
@@ -207,8 +207,26 @@ RTC::ReturnCode_t WebCamera::onActivated(RTC::UniqueId ec_id)
 		RTC_ERROR(( "Unable to open selected camera parameter file: %s", m_camera_param_filename.c_str() ));
 		RTC_ERROR(( "Camera parameters are set to zero" ));
 		std::cout << "Unable to open selected camera parameter file: " << m_camera_param_filename.c_str() << std::endl;
-		std::cout << "Please confirm the filename and set the correct filename" << std::endl;
-		return RTC::RTC_ERROR;
+		std::cout << "This program sets camera parameter as all zero." << std::endl;
+
+		cam_param.imageSize.width = width;
+		cam_param.imageSize.height = height;
+		//Clear camera intrinsic parameter to zero
+		cam_param.cameraMatrix.at<double>(0,0) = 0.0;
+		cam_param.cameraMatrix.at<double>(0,1) = 0.0;
+		cam_param.cameraMatrix.at<double>(1,1) = 0.0;
+		cam_param.cameraMatrix.at<double>(0,2) = 0.0;
+		cam_param.cameraMatrix.at<double>(1,2) = 0.0;
+
+		//Clear distortion parameter to zero
+		
+		cam_param.distCoeffs.at<double>(0) = 0.0;
+		cam_param.distCoeffs.at<double>(1) = 0.0;
+		cam_param.distCoeffs.at<double>(2) = 0.0;
+		cam_param.distCoeffs.at<double>(3) = 0.0;
+		cam_param.distCoeffs.at<double>(4) = 0.0;
+
+		return RTC::RTC_OK;
 	}
 
 	return RTC::RTC_OK;
