@@ -1,5 +1,7 @@
-@echo This program will run the target RTC
+@set rtc_name=WebCamera
 
+@call :EXEC_RTC %rtc_name%
+
+:EXEC_RTC
 @cd .\build\src\release
-WebCameraComp.exe -f rtc.conf
-
+@%1Comp.exe -f rtc.conf
