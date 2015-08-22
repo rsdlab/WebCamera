@@ -91,6 +91,12 @@ int main (int argc, char** argv)
 
   // run the manager in blocking mode
   // runManager(false) is the default.
+
+#ifdef WIN32
+  manager->runManager(false);
+
+#elif __APPLE__
+
   manager->runManager(true);
   
   while(!pCam);
@@ -105,6 +111,9 @@ int main (int argc, char** argv)
 
   pCam->finiCapture();
 
+#else // Linux
+  manager->runManager(false);
+#endif
   // If you want to run the manager in non-blocking mode, do like this
   // manager->runManager(true);
 

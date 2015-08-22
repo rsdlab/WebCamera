@@ -132,6 +132,15 @@ RTC::ReturnCode_t WebCamera::onShutdown(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t WebCamera::onActivated(RTC::UniqueId ec_id)
 {
+#ifdef WIN32
+	initCapture();
+#elif __APPLE__
+
+#else // Linux
+	initCapture();
+#endif
+
+
   is_active = true;
   return RTC::RTC_OK;
 }
@@ -202,8 +211,6 @@ RTC::ReturnCode_t WebCamera::initCapture()
 				cv::getOptimalNewCameraMatrix(param->cameraMatrix, param->distCoeffs, param->imageSize, 1, param->imageSize, 0),
 				param->imageSize, CV_16SC2, param->map1, param->map2);
     
-    //Set default capture mode
-    m_CameraCaptureService.m_cap_continuous = coil::toBool(m_cap_continuous_flag, "true", "false");
     
     std::cout << "Capture mode: " << m_cap_continuous_flag << std::endl;
     std::cout << "Capture start!!" << std::endl;
@@ -213,9 +220,12 @@ RTC::ReturnCode_t WebCamera::initCapture()
     RTC_ERROR(( "Camera parameters are set to zero" ));
     std::cout << "Unable to open selected camera parameter file: " << m_camera_param_filename.c_str() << std::endl;
     std::cout << "Please confirm the filename and set the correct filename" << std::endl;
-    return RTC::RTC_ERROR;
+    //return RTC::RTC_ERROR;
   }
-  
+
+  //Set default capture mode
+  m_CameraCaptureService.m_cap_continuous = coil::toBool(m_cap_continuous_flag, "true", "false");
+
   //cv::namedWindow("Image Window", CV_WINDOW_AUTOSIZE);
   return RTC::RTC_OK;
 }
@@ -224,6 +234,14 @@ RTC::ReturnCode_t WebCamera::initCapture()
 RTC::ReturnCode_t WebCamera::onDeactivated(RTC::UniqueId ec_id)
 {
   is_active = false;
+
+#ifdef WIN32
+  finiCapture();
+#elif __APPLE__
+
+#else
+  finiCapture();
+#endif
   return RTC::RTC_OK;
 }
 
@@ -241,12 +259,20 @@ RTC::ReturnCode_t WebCamera::finiCapture()
 
 RTC::ReturnCode_t WebCamera::onExecute(RTC::UniqueId ec_id)
 {
-  return RTC::RTC_OK;
+
+#ifdef WIN32
+	return captureAndProcess();
+#elif __APPLE__
+	return RTC::RTC_OK;
+#else
+	return captureAndProcess();
+#endif
+
 }
 
 RTC::ReturnCode_t WebCamera::captureAndProcess()
 {
-  std::cout << "CaptureAndProcess" << std::endl;
+  ///std::cout << "CaptureAndProcess" << std::endl;
   //Capture mode select
   if(m_CameraCaptureService.m_cap_continuous || (m_CameraCaptureService.m_cap_count > 0)) {
     if( m_CameraCaptureService.m_cap_count > 0) --m_CameraCaptureService.m_cap_count;
@@ -294,6 +320,7 @@ RTC::ReturnCode_t WebCamera::captureAndProcess()
       else
 	proc_image = src_image;
     }
+
     //Set camera parameter to output structure data
     m_CameraImage.data.intrinsic.matrix_element[0] = cam_param.cameraMatrix.at<double>(0,0);
     m_CameraImage.data.intrinsic.matrix_element[1] = cam_param.cameraMatrix.at<double>(0,1);
