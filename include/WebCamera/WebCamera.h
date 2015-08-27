@@ -330,6 +330,9 @@ class WebCamera
   CameraParam cam_param;
 
   bool is_alive, is_active;
+
+  // Ready flag for intrinstic matrix
+  bool m_readyUndistortion;
 public:
   RTC::ReturnCode_t initCapture();
   RTC::ReturnCode_t finiCapture();
@@ -338,6 +341,7 @@ public:
 
   bool isActive() {return is_active;}
   bool isAlive() {return is_alive;}
+
 };
 
 

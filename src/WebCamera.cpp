@@ -150,7 +150,7 @@ RTC::ReturnCode_t WebCamera::initCapture()
 {
   //Open camera device
   if(!cam_cap.open(m_camera_id)) {
-    RTC_ERROR(("Unable to open selected video device ID:[%d].", m_camera_id));
+    RTC_ERROR(("[RTC::WebCamera] Unable to open selected video device ID:[%d].", m_camera_id));
     return RTC::RTC_ERROR;
   }
   
@@ -160,9 +160,11 @@ RTC::ReturnCode_t WebCamera::initCapture()
   height = src_image.rows;
   depth = src_image.depth();
   
-  std::cout << "Image size:" << width << " x " << height << std::endl;
-  std::cout << "Depth     :" << depth << std::endl;
-  std::cout << "Channles  :" << src_image.channels() << std::endl;
+  std::cout << "[RTC::WebCamera] Init Capture" << std::endl;
+
+  std::cout << "[RTC::WebCamera] Image size:" << width << " x " << height << std::endl;
+  std::cout << "[RTC::WebCamera] Depth     :" << depth << std::endl;
+  std::cout << "[RTC::WebCamera] Channles  :" << src_image.channels() << std::endl;
   
   //Check channels of camera device
   nchannels = (m_output_color_format == "GRAY") ? 1 : 3;
@@ -170,24 +172,24 @@ RTC::ReturnCode_t WebCamera::initCapture()
   if(nchannels > src_image.channels()) {
     if(m_output_color_format == "RGB" || m_output_color_format == "JPEG" || m_output_color_format == "PNG")
       {
-	std::cout << "Convert GRAY image to RGB color image" <<std::endl;
+	std::cout << "[RTC::WebCamera] Convert GRAY image to RGB color image" <<std::endl;
       }
   }
   else if( nchannels < src_image.channels() ) {
-      std::cout<< "Convert RGB color image to GRAY image" <<std::endl;
+      std::cout<< "[RTC::WebCamera] Convert RGB color image to GRAY image" <<std::endl;
   }
   else {
     if(m_output_color_format == "RGB" || m_output_color_format == "JPEG" || m_output_color_format == "PNG") {
-      std::cout << "Convert BGR color image to RGB color image" << std::endl;			
+      std::cout << "[RTC::WebCamera] Convert BGR color image to RGB color image" << std::endl;			
     }
     else if(m_output_color_format == "GRAY") {
-      std::cout << "Gray image" <<std::endl;
+      std::cout << "[RTC::WebCamera] Gray image" <<std::endl;
     }
   }
   
   //Load camera parameter
   //If camera parameter file could not be found, whole camera parameters are set to zero.
-  std::cout<<"Loading camera parameter file: "<< m_camera_param_filename << std::endl;
+  std::cout<<"[RTC::WebCamera] Loading camera parameter file: "<< m_camera_param_filename << std::endl;
   
   cv::FileStorage fs(m_camera_param_filename, cv::FileStorage::READ);
   if(fs.isOpened()) {
@@ -196,13 +198,9 @@ RTC::ReturnCode_t WebCamera::initCapture()
     fs["camera_matrix"] >> cam_param.cameraMatrix;
     fs["distortion_coefficients"] >> cam_param.distCoeffs;
     
-    std::cout << "=================================================" << std::endl;
-    std::cout << "Camera Parameter" <<std::endl;
-    std::cout << "=================================================" << std::endl;
-    
-    std::cout << "Image size: " << cam_param.imageSize.width << "x" << cam_param.imageSize.height << std::endl;
-    std::cout << "Camera Matrix: "<< cam_param.cameraMatrix << std::endl;
-    std::cout << "Distortion coefficients: " << cam_param.distCoeffs << std::endl;
+    std::cout << "[RTC::WebCamera] Image size: " << cam_param.imageSize.width << "x" << cam_param.imageSize.height << std::endl;
+    std::cout << "[RTC::WebCamera] Camera Matrix: "<< cam_param.cameraMatrix << std::endl;
+    std::cout << "[RTC::WebCamera] Distortion coefficients: " << cam_param.distCoeffs << std::endl;
     
     //Set distortion coefficient to make rectify map
     CameraParam *param;
@@ -210,16 +208,18 @@ RTC::ReturnCode_t WebCamera::initCapture()
     cv::initUndistortRectifyMap(param->cameraMatrix, param->distCoeffs, cv::Mat(),
 				cv::getOptimalNewCameraMatrix(param->cameraMatrix, param->distCoeffs, param->imageSize, 1, param->imageSize, 0),
 				param->imageSize, CV_16SC2, param->map1, param->map2);
+	m_readyUndistortion = true; // cam_param is ready
     
-    
-    std::cout << "Capture mode: " << m_cap_continuous_flag << std::endl;
-    std::cout << "Capture start!!" << std::endl;
+    std::cout << "[RTC::WebCamera] Capture mode: " << m_cap_continuous_flag << std::endl;
+    std::cout << "[RTC::WebCamera] Capture start!!" << std::endl;
   }
   else {
     RTC_ERROR(( "Unable to open selected camera parameter file: %s", m_camera_param_filename.c_str() ));
     RTC_ERROR(( "Camera parameters are set to zero" ));
-    std::cout << "Unable to open selected camera parameter file: " << m_camera_param_filename.c_str() << std::endl;
-    std::cout << "Please confirm the filename and set the correct filename" << std::endl;
+    std::cout << "[RTC::WebCamera] Unable to open selected camera parameter file: " << m_camera_param_filename.c_str() << std::endl;
+    std::cout << "[RTC::WebCamera] Please confirm the filename and set the correct filename" << std::endl;
+	m_readyUndistortion = false; // cam_param is not ready
+	std::cout << "[RTC::WebCamera] Camera Image can not undistortion." << std::endl;
     //return RTC::RTC_ERROR;
   }
 
@@ -247,7 +247,7 @@ RTC::ReturnCode_t WebCamera::onDeactivated(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t WebCamera::finiCapture()
 {
-  std::cout<<"Capture stop!!" <<std::endl;
+  std::cout<<"[RTC::WebCamera] Capture stop!!" <<std::endl;
   
   //Release the device handler and allocated image buffer
   src_image.release();
@@ -285,7 +285,7 @@ RTC::ReturnCode_t WebCamera::captureAndProcess()
     //cv::imshow("Image Window", src_image);
     //return RTC::RTC_OK;
     if( src_image.empty() ) {
-      RTC_WARN(("Capture image data is empty!!"));
+      RTC_WARN(("[RTC::WebCamera] Capture image data is empty!!"));
       return RTC::RTC_OK;
     }
     
@@ -321,28 +321,30 @@ RTC::ReturnCode_t WebCamera::captureAndProcess()
 	proc_image = src_image;
     }
 
-    //Set camera parameter to output structure data
-    m_CameraImage.data.intrinsic.matrix_element[0] = cam_param.cameraMatrix.at<double>(0,0);
-    m_CameraImage.data.intrinsic.matrix_element[1] = cam_param.cameraMatrix.at<double>(0,1);
-    m_CameraImage.data.intrinsic.matrix_element[2] = cam_param.cameraMatrix.at<double>(1,1);
-    m_CameraImage.data.intrinsic.matrix_element[3] = cam_param.cameraMatrix.at<double>(0,2);
-    m_CameraImage.data.intrinsic.matrix_element[4] = cam_param.cameraMatrix.at<double>(1,2);
-    
-    //Copy undistortion matrix
-    m_CameraImage.data.intrinsic.distortion_coefficient.length(cam_param.distCoeffs.rows);
-    cv::Mat distortion_image;
-    if(!coil::toBool(m_undistortion_flag, "true", "false")) {
-      cv::undistort(proc_image, distortion_image, cam_param.cameraMatrix, cam_param.distCoeffs, cam_param.cameraMatrix);
-      
-      //Copy distortion coefficient to output parameter
-      for(int j(0); j < 5; ++j)
-	m_CameraImage.data.intrinsic.distortion_coefficient[j] = 0.0;
-    }
-    else {
-      //Copy distortion coefficient to output parameter
-      for(int j(0); j < 5; ++j)
-	m_CameraImage.data.intrinsic.distortion_coefficient[j] = cam_param.distCoeffs.at<double>(j);
-    }
+	if (m_readyUndistortion) {
+		//Set camera parameter to output structure data
+		m_CameraImage.data.intrinsic.matrix_element[0] = cam_param.cameraMatrix.at<double>(0, 0);
+		m_CameraImage.data.intrinsic.matrix_element[1] = cam_param.cameraMatrix.at<double>(0, 1);
+		m_CameraImage.data.intrinsic.matrix_element[2] = cam_param.cameraMatrix.at<double>(1, 1);
+		m_CameraImage.data.intrinsic.matrix_element[3] = cam_param.cameraMatrix.at<double>(0, 2);
+		m_CameraImage.data.intrinsic.matrix_element[4] = cam_param.cameraMatrix.at<double>(1, 2);
+
+		//Copy undistortion matrix
+		m_CameraImage.data.intrinsic.distortion_coefficient.length(cam_param.distCoeffs.rows);
+		cv::Mat distortion_image;
+		if (!coil::toBool(m_undistortion_flag, "true", "false")) {
+			cv::undistort(proc_image, distortion_image, cam_param.cameraMatrix, cam_param.distCoeffs, cam_param.cameraMatrix);
+
+			//Copy distortion coefficient to output parameter
+			for (int j(0); j < 5; ++j)
+				m_CameraImage.data.intrinsic.distortion_coefficient[j] = 0.0;
+		}
+		else {
+			//Copy distortion coefficient to output parameter
+			for (int j(0); j < 5; ++j)
+				m_CameraImage.data.intrinsic.distortion_coefficient[j] = cam_param.distCoeffs.at<double>(j);
+		}
+	}
     
     //Copy image parameter to output data based on TimedCameraImage structure
     m_CameraImage.data.image.width = width;
@@ -376,7 +378,7 @@ RTC::ReturnCode_t WebCamera::captureAndProcess()
       compression_param[1] = (int)((double)m_compression_ratio/10.0);
       if(compression_param[1] == 10)
 	compression_param[1] = 9;
-      std::cout<<"PNG compression ratio: "<<compression_param[1] << "\r";
+      std::cout<<"[RTC::WebCamera] PNG compression ratio: "<<compression_param[1] << "\r";
       
       
       //Encode raw image data to jpeg data
@@ -389,7 +391,7 @@ RTC::ReturnCode_t WebCamera::captureAndProcess()
     else {
       m_CameraImage.data.image.format = Img::CF_GRAY;
       
-      std::cout<<"Selected image compression mode is not defined. Please confirm correct compression mode!"<<std::endl;
+      std::cout<<"[RTC::WebCamera] Selected image compression mode is not defined. Please confirm correct compression mode!"<<std::endl;
       m_CameraImage.data.image.raw_data.length( width * height * nchannels);
       for( int i(0); i< height; ++i )
 	memcpy(&m_CameraImage.data.image.raw_data[ i * width * nchannels], &proc_image.data[ i * proc_image.step ], width * nchannels);			
@@ -402,7 +404,7 @@ RTC::ReturnCode_t WebCamera::captureAndProcess()
   }
   else {
     RTC_DEBUG( ("Waiting capture mode command via ServicePort") );
-    std::cout << "Waiting capture mode command via ServicePort" << std::endl;
+    std::cout << "[RTC::WebCamera] Waiting capture mode command via ServicePort" << std::endl;
     return RTC::RTC_OK;
   }
   return RTC::RTC_OK;
