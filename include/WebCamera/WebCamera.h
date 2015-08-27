@@ -265,6 +265,12 @@ class WebCamera
    */
   std::string m_undistortion_flag;
   /*!
+  *
+  * - Name:  preview_window
+  * - DefaultValue: false
+  */
+  std::string m_preview_window;
+  /*!
    * 
    * - Name:  cap_continuous_flag
    * - DefaultValue: false
@@ -333,6 +339,9 @@ class WebCamera
 
   // Ready flag for intrinstic matrix
   bool m_readyUndistortion;
+
+  // In preview mode
+  bool m_preview;
 public:
   RTC::ReturnCode_t initCapture();
   RTC::ReturnCode_t finiCapture();

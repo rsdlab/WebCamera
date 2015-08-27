@@ -29,19 +29,22 @@ static const char* webcamera_spec[] =
     "conf.default.output_color_format", "RGB",
     "conf.default.camera_param_filename", "../../camera.yml",
     "conf.default.undistortion_flag", "false",
-    "conf.default.cap_continuous_flag", "true",
+	"conf.default.preview_window", "false",
+	"conf.default.cap_continuous_flag", "true",
     "conf.default.compression_ratio", "75",
     // Widget
     "conf.__widget__.camera_id", "text",
     "conf.__widget__.output_color_format", "radio",
     "conf.__widget__.camera_param_filename", "text",
     "conf.__widget__.undistortion_flag", "radio",
-    "conf.__widget__.cap_continuous_flag", "radio",
+	"conf.__widget__.preview_window", "radio",
+	"conf.__widget__.cap_continuous_flag", "radio",
     "conf.__widget__.compression_ratio", "slider.1",
     // Constraints
     "conf.__constraints__.output_color_format", "(RGB,GRAY,JPEG,PNG)",
     "conf.__constraints__.undistortion_flag", "(true,false)",
-    "conf.__constraints__.cap_continuous_flag", "(true,false)",
+	"conf.__constraints__.preview_window", "(true,false)",
+	"conf.__constraints__.cap_continuous_flag", "(true,false)",
     "conf.__constraints__.compression_ratio", "0<=x<=100",
     ""
   };
@@ -96,6 +99,7 @@ RTC::ReturnCode_t WebCamera::onInitialize()
   bindParameter("output_color_format", m_output_color_format, "RGB");
   bindParameter("camera_param_filename", m_camera_param_filename, "..\\..\\camera.yml");
   bindParameter("undistortion_flag", m_undistortion_flag, "false");
+  bindParameter("preview_window", m_preview_window, "false");
   bindParameter("cap_continuous_flag", m_cap_continuous_flag, "false");
   bindParameter("compression_ratio", m_compression_ratio, "75");
   // </rtc-template>
@@ -219,14 +223,17 @@ RTC::ReturnCode_t WebCamera::initCapture()
     std::cout << "[RTC::WebCamera] Unable to open selected camera parameter file: " << m_camera_param_filename.c_str() << std::endl;
     std::cout << "[RTC::WebCamera] Please confirm the filename and set the correct filename" << std::endl;
 	m_readyUndistortion = false; // cam_param is not ready
-	std::cout << "[RTC::WebCamera] Camera Image can not undistortion." << std::endl;
+	std::cout << "[RTC::WebCamera] Camera Image can not undistortion, but proceed." << std::endl;
     //return RTC::RTC_ERROR;
   }
 
   //Set default capture mode
   m_CameraCaptureService.m_cap_continuous = coil::toBool(m_cap_continuous_flag, "true", "false");
 
-  //cv::namedWindow("Image Window", CV_WINDOW_AUTOSIZE);
+  m_preview = coil::toBool(m_preview_window, "true", "false");
+  if (m_preview) {
+	  cv::namedWindow("Image Window", CV_WINDOW_AUTOSIZE);
+  }
   return RTC::RTC_OK;
 }
 
@@ -252,6 +259,10 @@ RTC::ReturnCode_t WebCamera::finiCapture()
   //Release the device handler and allocated image buffer
   src_image.release();
   cam_cap.release();
+
+  if (m_preview) {
+	  cv::destroyWindow("Image Window");
+  }
   
   return RTC::RTC_OK;
 }
@@ -288,7 +299,23 @@ RTC::ReturnCode_t WebCamera::captureAndProcess()
       RTC_WARN(("[RTC::WebCamera] Capture image data is empty!!"));
       return RTC::RTC_OK;
     }
-    
+
+	/// Preview
+	bool flag = coil::toBool(m_preview_window, "true", "false");
+	// check configuration is changed
+	if (flag && !m_preview) { // rising
+		cv::namedWindow("Image Window", CV_WINDOW_AUTOSIZE);
+	}
+	else if (!flag && m_preview) { // falling
+		cv::destroyWindow("Image Window");
+	}
+
+	m_preview = flag;
+	if (m_preview) {
+		cv::imshow("Image Window", src_image);
+		::cvWaitKey(1);
+	}
+
     //***********************************************************************************
     //***********************************************************************************
     //Following part is the template for common camera interface
@@ -343,6 +370,13 @@ RTC::ReturnCode_t WebCamera::captureAndProcess()
 			//Copy distortion coefficient to output parameter
 			for (int j(0); j < 5; ++j)
 				m_CameraImage.data.intrinsic.distortion_coefficient[j] = cam_param.distCoeffs.at<double>(j);
+		}
+	}
+	else {
+		if (!coil::toBool(m_undistortion_flag, "true", "false")) {
+			std::cout << "[RTC::WebCamera] Camera parameter file is not loaded." << std::endl;
+			std::cout << "[RTC::WebCamera] undistortion_flag configuration must be false to continue." << std::endl;
+			return RTC::RTC_ERROR;
 		}
 	}
     
