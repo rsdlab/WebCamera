@@ -351,6 +351,7 @@ public:
   bool isActive() {return is_active;}
   bool isAlive() {return is_alive;}
 
+  std::string m_preview_window_name;
 };
 
 

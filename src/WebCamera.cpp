@@ -106,6 +106,8 @@ RTC::ReturnCode_t WebCamera::onInitialize()
   is_alive = true;
 
   updateParameters("default");
+
+  m_preview_window_name = this->getInstanceName();
   return RTC::RTC_OK;
 }
 
@@ -232,7 +234,7 @@ RTC::ReturnCode_t WebCamera::initCapture()
 
   m_preview = coil::toBool(m_preview_window, "true", "false");
   if (m_preview) {
-	  cv::namedWindow("Image Window", CV_WINDOW_AUTOSIZE);
+	  cv::namedWindow(m_preview_window_name, CV_WINDOW_AUTOSIZE);
   }
   return RTC::RTC_OK;
 }
@@ -261,7 +263,7 @@ RTC::ReturnCode_t WebCamera::finiCapture()
   cam_cap.release();
 
   if (m_preview) {
-	  cv::destroyWindow("Image Window");
+	  cv::destroyWindow(m_preview_window_name);
   }
   
   return RTC::RTC_OK;
@@ -304,15 +306,15 @@ RTC::ReturnCode_t WebCamera::captureAndProcess()
 	bool flag = coil::toBool(m_preview_window, "true", "false");
 	// check configuration is changed
 	if (flag && !m_preview) { // rising
-		cv::namedWindow("Image Window", CV_WINDOW_AUTOSIZE);
+		cv::namedWindow(m_preview_window_name, CV_WINDOW_AUTOSIZE);
 	}
 	else if (!flag && m_preview) { // falling
-		cv::destroyWindow("Image Window");
+		cv::destroyWindow(m_preview_window_name);
 	}
 
 	m_preview = flag;
 	if (m_preview) {
-		cv::imshow("Image Window", src_image);
+		cv::imshow(m_preview_window_name, src_image);
 		::cvWaitKey(1);
 	}
 
