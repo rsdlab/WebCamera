@@ -375,7 +375,7 @@ RTC::ReturnCode_t WebCamera::captureAndProcess()
 		}
 	}
 	else {
-		if (!coil::toBool(m_undistortion_flag, "true", "false")) {
+		if (coil::toBool(m_undistortion_flag, "true", "false")) {
 			std::cout << "[RTC::WebCamera] Camera parameter file is not loaded." << std::endl;
 			std::cout << "[RTC::WebCamera] undistortion_flag configuration must be false to continue." << std::endl;
 			return RTC::RTC_ERROR;
