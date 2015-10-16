@@ -101,15 +101,25 @@ int main (int argc, char** argv)
   
   while(!pCam);
 
-  pCam->initCapture();
 
+  bool active_flag = false;
   while(pCam->isAlive()) {
-    if (pCam->isActive()) {
+    bool flag = pCam->isActive();
+    if (!active_flag && flag) {
+      pCam->initCapture();
+    }
+    if (flag) {
       pCam->captureAndProcess();
     }
+    if (active_flag && !flag) {
+      pCam->finiCapture();
+    }
+    active_flag = flag;
   }
 
-  pCam->finiCapture();
+  if (active_flag) {
+    pCam->finiCapture();
+  }
 
 #else // Linux
   manager->runManager(false);
