@@ -32,6 +32,8 @@ static const char* webcamera_spec[] =
 	"conf.default.preview_window", "false",
 	"conf.default.cap_continuous_flag", "true",
     "conf.default.compression_ratio", "75",
+    "conf.default.frame_width", "640",
+    "conf.default.frame_height", "480",
     // Widget
     "conf.__widget__.camera_id", "text",
     "conf.__widget__.output_color_format", "radio",
@@ -102,6 +104,8 @@ RTC::ReturnCode_t WebCamera::onInitialize()
   bindParameter("preview_window", m_preview_window, "false");
   bindParameter("cap_continuous_flag", m_cap_continuous_flag, "false");
   bindParameter("compression_ratio", m_compression_ratio, "75");
+  bindParameter("frame_width", m_frame_width, "640");
+  bindParameter("frame_height", m_frame_height, "480");
   // </rtc-template>
   is_alive = true;
 
@@ -159,7 +163,8 @@ RTC::ReturnCode_t WebCamera::initCapture()
     RTC_ERROR(("[RTC::WebCamera] Unable to open selected video device ID:[%d].", m_camera_id));
     return RTC::RTC_ERROR;
   }
-  
+  cam_cap.set(CV_CAP_PROP_FRAME_WIDTH, m_frame_width);
+  cam_cap.set(CV_CAP_PROP_FRAME_HEIGHT, m_frame_height);
   //Get and show the camera device properties
   cam_cap >> src_image;
   width = src_image.cols;

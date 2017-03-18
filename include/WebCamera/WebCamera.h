@@ -284,6 +284,9 @@ class WebCamera
    */
   int m_compression_ratio;
 
+  int m_frame_width;
+  
+  int m_frame_height;
   // </rtc-template>
 
   // DataInPort declaration
