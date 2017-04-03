@@ -1,6 +1,6 @@
 set(PKG_DEPS "openrtm-aist")
 set(PKG_LIBS -l${PROJECT_NAME})
-set(pkg_conf_file ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME_LOWER}.pc)
+set(pkg_conf_file ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.pc)
 configure_file(${PROJECT_NAME}.pc.in ${pkg_conf_file} @ONLY)
 install(FILES ${pkg_conf_file}
     DESTINATION ${LIB_INSTALL_DIR}/pkgconfig/ COMPONENT component)
