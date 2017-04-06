@@ -31,6 +31,8 @@ static const char* webcamera_spec[] =
     "conf.default.undistortion_flag", "false",
     "conf.default.cap_continuous_flag", "true",
     "conf.default.compression_ratio", "75",
+    "conf.default.frame_width", "640",
+    "conf.default.frame_height", "480",
     // Widget
     "conf.__widget__.camera_id", "text",
     "conf.__widget__.output_color_format", "radio",
