@@ -276,6 +276,19 @@ class WebCamera
    */
   int m_compression_ratio;
 
+  /*!
+   * This parameter is the default width of captured image
+   * - Name:  frame_width
+   * - DefaultValue: 640
+   */
+  int m_frame_width;
+  
+  /*!
+   * This parameter is the default height of captured image
+   * - Name:  frame_height
+   * - DefaultValue: 640
+   */
+  int m_frame_height;
   // </rtc-template>
 
   // DataInPort declaration
