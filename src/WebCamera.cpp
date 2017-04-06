@@ -99,6 +99,8 @@ RTC::ReturnCode_t WebCamera::onInitialize()
   bindParameter("undistortion_flag", m_undistortion_flag, "false");
   bindParameter("cap_continuous_flag", m_cap_continuous_flag, "false");
   bindParameter("compression_ratio", m_compression_ratio, "75");
+  bindParameter("frame_width", m_frame_width, "640");
+  bindParameter("frame_height", m_frame_height, "480");
   // </rtc-template>
   
   return RTC::RTC_OK;
@@ -135,6 +137,8 @@ RTC::ReturnCode_t WebCamera::onActivated(RTC::UniqueId ec_id)
 		return RTC::RTC_ERROR;
 	}
 
+        cam_cap.set(CV_CAP_PROP_FRAME_WIDTH, m_frame_width);
+	cam_cap.set(CV_CAP_PROP_FRAME_HEIGHT, m_frame_height);	
 	//Get and show the camera device properties
 	cam_cap >> src_image;
 	width = src_image.cols;
