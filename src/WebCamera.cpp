@@ -314,10 +314,6 @@ RTC::ReturnCode_t WebCamera::onExecute(RTC::UniqueId ec_id)
       m_CameraImage.data.intrinsic.matrix_element[3] = cam_param.cameraMatrix.at<double>(1,2);
       m_CameraImage.data.intrinsic.matrix_element[4] = cam_param.cameraMatrix.at<double>(2,2);
       
-      for(int i(0);i<5; i++)
-	{
-	  std::cout<<m_CameraImage.data.intrinsic.matrix_element[i]<<",";
-	}
       std::cout<<std::endl;
       //Copy undistortion matrix
       m_CameraImage.data.intrinsic.distortion_coefficient.length(cam_param.distCoeffs.rows);
