@@ -339,6 +339,7 @@ class WebCamera
   cv::Mat src_image, proc_image;
   int width, height, depth, nchannels;
   CameraParam cam_param;
+  bool isFileLoad;
 
 };
 

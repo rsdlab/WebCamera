@@ -103,6 +103,7 @@ RTC::ReturnCode_t WebCamera::onInitialize()
   bindParameter("frame_height", m_frame_height, "480");
   // </rtc-template>
   
+  isFileLoad = false;
   return RTC::RTC_OK;
 }
 
@@ -182,6 +183,7 @@ RTC::ReturnCode_t WebCamera::onActivated(RTC::UniqueId ec_id)
   cv::FileStorage fs(m_camera_param_filename, cv::FileStorage::READ);
   if(fs.isOpened())
     {
+      isFileLoad = true;
       fs["image_width"] >> cam_param.imageSize.width;
       fs["image_height"] >> cam_param.imageSize.height;
       fs["camera_matrix"] >> cam_param.cameraMatrix;
@@ -214,6 +216,8 @@ RTC::ReturnCode_t WebCamera::onActivated(RTC::UniqueId ec_id)
       RTC_ERROR(( "Camera parameters are set to zero" ));
       std::cout << "Unable to open selected camera parameter file: " << m_camera_param_filename.c_str() << std::endl;
       std::cout << "This program sets camera parameter as all zero." << std::endl;
+
+      isFileLoad = false;
       
       cam_param.imageSize.width = width;
       cam_param.imageSize.height = height;
@@ -313,18 +317,22 @@ RTC::ReturnCode_t WebCamera::onExecute(RTC::UniqueId ec_id)
       m_CameraImage.data.intrinsic.matrix_element[2] = cam_param.cameraMatrix.at<double>(1,1);
       m_CameraImage.data.intrinsic.matrix_element[3] = cam_param.cameraMatrix.at<double>(1,2);
       m_CameraImage.data.intrinsic.matrix_element[4] = cam_param.cameraMatrix.at<double>(2,2);
-      
-      std::cout<<std::endl;
+
+
       //Copy undistortion matrix
       m_CameraImage.data.intrinsic.distortion_coefficient.length(cam_param.distCoeffs.rows);
-      cv::Mat distortion_image;
-      if(!coil::toBool(m_undistortion_flag, "true", "false"))
+      cv::Mat distortion_temp;
+      if(coil::toBool(m_undistortion_flag, "true", "false"))
 	{
-	  cv::undistort(proc_image, distortion_image, cam_param.cameraMatrix, cam_param.distCoeffs, cam_param.cameraMatrix);
-	  
+	  if(isFileLoad)
+	    {
+	      distortion_temp = proc_image.clone();
+	      cv::undistort(distortion_temp, proc_image, cam_param.cameraMatrix, cam_param.distCoeffs, cam_param.cameraMatrix);
+	      
+	    }
 	  //Copy distortion coefficient to output parameter
 	  for(int j(0); j < 5; ++j)
-	    m_CameraImage.data.intrinsic.distortion_coefficient[j] = 0.0;
+	    m_CameraImage.data.intrinsic.distortion_coefficient[j] = 0.0; 
 	}
       else
 	{
@@ -387,19 +395,19 @@ RTC::ReturnCode_t WebCamera::onExecute(RTC::UniqueId ec_id)
 	  for( int i(0); i< height; ++i )
 	    memcpy(&m_CameraImage.data.image.raw_data[ i * width * nchannels], &proc_image.data[ i * proc_image.step ], width * nchannels);			
 	}
-//Output image data via OutPort
-m_CameraImageOut.write();
-//***********************************************************************************
-//End of the template part
-//***********************************************************************************
-}
+      //Output image data via OutPort
+      m_CameraImageOut.write();
+      //***********************************************************************************
+      //End of the template part
+      //***********************************************************************************
+    }
   else
     {
       RTC_DEBUG( ("Waiting capture mode command via ServicePort") );
       std::cout << "Waiting capture mode command via ServicePort" << std::endl;
       return RTC::RTC_OK;
     }
-return RTC::RTC_OK;
+  return RTC::RTC_OK;
 }
 
 
