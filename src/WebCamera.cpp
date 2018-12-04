@@ -293,21 +293,21 @@ RTC::ReturnCode_t WebCamera::onExecute(RTC::UniqueId ec_id)
       if(nchannels > src_image.channels())
 	{
 	  if( m_output_color_format == "RGB" || m_output_color_format == "JPEG" || m_output_color_format == "PNG")
-	    cv::cvtColor(src_image, proc_image, CV_GRAY2RGB);
+	    cv::cvtColor(src_image, proc_image, cv::COLOR_GRAY2RGB/*CV_GRAY2RGB*/);
 	  nchannels = 3;
 	}
       else if( nchannels < src_image.channels() )
 	{
 	  if( m_output_color_format == "GRAY" )
 	    {
-      cv::cvtColor(src_image, proc_image, CV_BGR2GRAY);
+	      cv::cvtColor(src_image, proc_image, cv::COLOR_BGR2GRAY/*CV_BGR2GRAY*/);
       nchannels = 1;
     }
 	}
       else
 	{
-	  if( m_output_color_format == "RGB" || m_output_color_format == "JPEG" || m_output_color_format == "PNG")
-	    cv::cvtColor(src_image, proc_image, CV_BGR2RGB);
+	  if( m_output_color_format == "RGB" /*|| m_output_color_format == "JPEG" || m_output_color_format == "PNG"*/)
+	    cv::cvtColor(src_image, proc_image, cv::COLOR_BGR2RGB/*CV_BGR2RGB*/);
 	  else
 	    proc_image = src_image;
 	}
