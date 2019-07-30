@@ -138,8 +138,8 @@ RTC::ReturnCode_t WebCamera::onActivated(RTC::UniqueId ec_id)
       return RTC::RTC_ERROR;
     }
   
-  cam_cap.set(CV_CAP_PROP_FRAME_WIDTH, m_frame_width);
-  cam_cap.set(CV_CAP_PROP_FRAME_HEIGHT, m_frame_height);	
+  cam_cap.set(3, m_frame_width);
+  cam_cap.set(4, m_frame_height);	
   //Get and show the camera device properties
   cam_cap >> src_image;
   width = src_image.cols;
@@ -358,7 +358,7 @@ RTC::ReturnCode_t WebCamera::onExecute(RTC::UniqueId ec_id)
 	  m_CameraImage.data.image.format = Img::CF_JPEG;
 	  //Jpeg encoding using OpenCV image compression function
 	  std::vector<int> compression_param = std::vector<int>(2); 
-	  compression_param[0] = CV_IMWRITE_JPEG_QUALITY;
+	  compression_param[0] = cv::IMWRITE_JPEG_QUALITY;
 	  compression_param[1] = m_compression_ratio;
 	  //Encode raw image data to jpeg data
 	  std::vector<uchar> compressed_image;
@@ -372,7 +372,7 @@ RTC::ReturnCode_t WebCamera::onExecute(RTC::UniqueId ec_id)
 	  m_CameraImage.data.image.format = Img::CF_PNG;
 	  //Jpeg encoding using OpenCV image compression function
 	  std::vector<int> compression_param = std::vector<int>(2); 
-	  compression_param[0] = CV_IMWRITE_PNG_COMPRESSION;
+	  compression_param[0] = cv::IMWRITE_PNG_COMPRESSION;
 	  compression_param[1] = (int)((double)m_compression_ratio/10.0);
 	  if(compression_param[1] == 10)
 	    compression_param[1] = 9;

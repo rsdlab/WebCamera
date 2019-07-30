@@ -1,3 +1,2 @@
-This component is Web Camera RTC.
-
-This components can be used on OpenRTM-aist-1.1.0 to OpenRTM-aist-1.1.2.
+This component is Web Camera RTC for OpenRTM-aist-1.2.0 and OpenCV4.
+If you want to use lower version, please use the branch version of "OpenRTM-1.1.2".
