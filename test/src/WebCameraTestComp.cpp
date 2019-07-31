@@ -1,6 +1,6 @@
 ﻿// -*- C++ -*-
 /*!
- * @file WebCameraComp.cpp
+ * @file WebCameraTestComp.cpp
  * @brief Standalone component
  * @date $Date$
  *
@@ -11,16 +11,16 @@
 #include <iostream>
 #include <string>
 #include <stdlib.h>
-#include "WebCamera.h"
+#include "WebCameraTest.h"
 
 
 void MyModuleInit(RTC::Manager* manager)
 {
-  WebCameraInit(manager);
+  WebCameraTestInit(manager);
   RTC::RtcBase* comp;
 
   // Create a component
-  comp = manager->createComponent("WebCamera");
+  comp = manager->createComponent("WebCameraTest");
 
   if (comp==NULL)
   {

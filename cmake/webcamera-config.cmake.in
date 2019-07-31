@@ -1,0 +1,54 @@
+# WebCamera CMake config file
+#
+# This file sets the following variables:
+# WebCamera_FOUND - Always TRUE.
+# WebCamera_INCLUDE_DIRS - Directories containing the WebCamera include files.
+# WebCamera_IDL_DIRS - Directories containing the WebCamera IDL files.
+# WebCamera_LIBRARIES - Libraries needed to use WebCamera.
+# WebCamera_DEFINITIONS - Compiler flags for WebCamera.
+# WebCamera_VERSION - The version of WebCamera found.
+# WebCamera_VERSION_MAJOR - The major version of WebCamera found.
+# WebCamera_VERSION_MINOR - The minor version of WebCamera found.
+# WebCamera_VERSION_REVISION - The revision version of WebCamera found.
+# WebCamera_VERSION_CANDIDATE - The candidate version of WebCamera found.
+
+message(STATUS "Found WebCamera-@PROJECT_VERSION@")
+set(WebCamera_FOUND TRUE)
+
+find_package(<dependency> REQUIRED)
+
+#set(WebCamera_INCLUDE_DIRS
+#    "@CMAKE_INSTALL_PREFIX@/include/@PROJECT_NAME_LOWER@-@PROJECT_VERSION_MAJOR@"
+#    ${<dependency>_INCLUDE_DIRS}
+#    )
+#
+#set(WebCamera_IDL_DIRS
+#    "@CMAKE_INSTALL_PREFIX@/include/@PROJECT_NAME_LOWER@-@PROJECT_VERSION_MAJOR@/idl")
+set(WebCamera_INCLUDE_DIRS
+    "@CMAKE_INSTALL_PREFIX@/include/@CPACK_PACKAGE_FILE_NAME@"
+    ${<dependency>_INCLUDE_DIRS}
+    )
+set(WebCamera_IDL_DIRS
+    "@CMAKE_INSTALL_PREFIX@/include/@CPACK_PACKAGE_FILE_NAME@/idl")
+
+
+if(WIN32)
+    set(WebCamera_LIBRARIES
+        "@CMAKE_INSTALL_PREFIX@/@LIB_INSTALL_DIR@/@CMAKE_SHARED_LIBRARY_PREFIX@@PROJECT_NAME_LOWER@@CMAKE_STATIC_LIBRARY_SUFFIX@"
+        ${<dependency>_LIBRARIES}
+        )
+else(WIN32)
+    set(WebCamera_LIBRARIES
+        "@CMAKE_INSTALL_PREFIX@/@LIB_INSTALL_DIR@/@CMAKE_SHARED_LIBRARY_PREFIX@@PROJECT_NAME_LOWER@@CMAKE_SHARED_LIBRARY_SUFFIX@"
+        ${<dependency>_LIBRARIES}
+        )
+endif(WIN32)
+
+set(WebCamera_DEFINITIONS ${<dependency>_DEFINITIONS})
+
+set(WebCamera_VERSION @PROJECT_VERSION@)
+set(WebCamera_VERSION_MAJOR @PROJECT_VERSION_MAJOR@)
+set(WebCamera_VERSION_MINOR @PROJECT_VERSION_MINOR@)
+set(WebCamera_VERSION_REVISION @PROJECT_VERSION_REVISION@)
+set(WebCamera_VERSION_CANDIDATE @PROJECT_VERSION_CANDIDATE@)
+

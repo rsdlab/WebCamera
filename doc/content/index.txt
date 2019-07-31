@@ -1,4 +1,4 @@
-WebCameraName - English
+﻿WebCameraName - English
 ========================
 
 .. toctree::
